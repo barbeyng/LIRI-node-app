@@ -1,6 +1,7 @@
 // Retrieve keys info
 require('dotenv').config();
 var keys = require('./keys.js');
+var fs = require('fs');
 
 // Capture user input from the command line
 var request = process.argv[2];
@@ -58,14 +59,17 @@ function spotifyFunc(input) {
     spotifyKey.search({ type: 'track', query: input }, function (err, data) {
         if (!err) {
             songName = data.tracks.items[0];
-            console.log('Artist: ' + songName.artists[0].name);
-            console.log('===========================================');
-            console.log('Song name: ' + songName.name);
-            console.log('===========================================');
-            console.log('Preview here: ' + songName.preview_url);
-            console.log('===========================================');
-            console.log('Album: ' + songName.album.name);
-            console.log('===========================================');
+            var searchData = ['\n\n' +
+            '===========================================\n\n' +
+            'Artist: ' + songName.artists[0].name,
+            'Song name: ' + songName.name,
+            'Preview here: ' + songName.preview_url,
+            'Album: ' + songName.album.name,
+            ].join('\n\n');
+            fs.appendFile('log.txt', searchData, function (err) {
+                if (err) throw err;
+                console.log('\n' + searchData + '\n');
+            });
         } else {
             console.log(err);
         }
@@ -83,21 +87,21 @@ function omdbFunc(input) {
     request(query, function (err, response, body) {
         if (!err) {
             var movie = JSON.parse(body);
-            console.log('Movie name: ' + movie.Title);
-            console.log('===========================================');
-            console.log('Year released: ' + movie.Year);
-            console.log('===========================================');
-            console.log('IMDB rating: ' + movie.imdbRating);
-            console.log('===========================================');
-            console.log('Rotten Tomatoes: ' + movie.Ratings[1].Value);
-            console.log('===========================================');
-            console.log('Country produced: ' + movie.Country);
-            console.log('===========================================');
-            console.log('Language: ' + movie.Language);
-            console.log('===========================================');
-            console.log('Plot: ' + movie.Plot);
-            console.log('===========================================');
-            console.log('Actors: ' + movie.Actors);
+            var searchData = ['\n\n' +
+                '===========================================\n\n' +
+                'Movie name: ' + movie.Title,
+            'Year released: ' + movie.Year,
+            'IMDB rating: ' + movie.imdbRating,
+            'Rotten Tomatoes: ' + movie.Ratings[1].Value,
+            'Country produced: ' + movie.Country,
+            'Language: ' + movie.Language,
+            'Plot: ' + movie.Plot,
+            'Actors: ' + movie.Actors
+            ].join('\n\n');
+            fs.appendFile('log.txt', searchData, function (err) {
+                if (err) throw err;
+                console.log('\n' + searchData + '\n');
+            });
         } else {
             console.log(err);
         }
@@ -106,7 +110,6 @@ function omdbFunc(input) {
 
 // Takes command by reading random.txt
 function randomFunc(input) {
-    var fs = require('fs');
     fs.readFile('random.txt', 'utf8', function (err, data) {
         if (!err) {
             txtData = data.split(',');
