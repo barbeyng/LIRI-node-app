@@ -6,8 +6,8 @@ Try it out.
 
 Enter one of the following commands in the command line:
 * my-tweets
-* spotify-this-song
-* movie-this
+* spotify-this-song (enter your favorite song, mine is 'Barbie Girl' by Aqua!)
+* movie-this (enter your favorite movie)
 * do-what-it-says
 
 my-tweets will return 20 of my most recent tweets.
