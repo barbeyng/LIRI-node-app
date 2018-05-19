@@ -1,7 +1,12 @@
 // Retrieve keys info
 require('dotenv').config();
 var keys = require('./keys.js');
+
+// Need this to run node.js
 var fs = require('fs');
+
+// Push data from spotify and omdb into here for toLog function
+var searchData = [];
 
 // Capture user input from the command line
 var request = process.argv[2];
@@ -38,9 +43,17 @@ function twitterFunc() {
         if (!err) {
             for (var i = 0; i < 20; i++) {
                 var tweet = tweets[i];
-                console.log(tweet.text);
-                console.log('Tweeted on: ' + tweet.created_at);
-                console.log("===========================================");
+                var twitterData = [
+                    '\n\n' +
+                    '===========================================',
+                    tweet.text,
+                    'Tweeted on: ' + tweet.created_at,
+                ].join('\n\n');
+                console.log(twitterData);
+
+                // I couldn't get this to to log without looping for life
+                // searchData.push(twitterData);
+                // toLog();
             }
         } else {
             console.log(err);
@@ -59,17 +72,16 @@ function spotifyFunc(input) {
     spotifyKey.search({ type: 'track', query: input }, function (err, data) {
         if (!err) {
             songName = data.tracks.items[0];
-            var searchData = ['\n\n' +
-            '===========================================\n\n' +
-            'Artist: ' + songName.artists[0].name,
-            'Song name: ' + songName.name,
-            'Preview here: ' + songName.preview_url,
-            'Album: ' + songName.album.name,
+            var songData = [
+                '\n\n' +
+                '===========================================\n\n' +
+                'Artist: ' + songName.artists[0].name,
+                'Song name: ' + songName.name,
+                'Preview here: ' + songName.preview_url,
+                'Album: ' + songName.album.name,
             ].join('\n\n');
-            fs.appendFile('log.txt', searchData, function (err) {
-                if (err) throw err;
-                console.log('\n' + searchData + '\n');
-            });
+            searchData.push(songData);
+            toLog();
         } else {
             console.log(err);
         }
@@ -87,21 +99,20 @@ function omdbFunc(input) {
     request(query, function (err, response, body) {
         if (!err) {
             var movie = JSON.parse(body);
-            var searchData = ['\n\n' +
+            var movieData = [
+                '\n\n' +
                 '===========================================\n\n' +
                 'Movie name: ' + movie.Title,
-            'Year released: ' + movie.Year,
-            'IMDB rating: ' + movie.imdbRating,
-            'Rotten Tomatoes: ' + movie.Ratings[1].Value,
-            'Country produced: ' + movie.Country,
-            'Language: ' + movie.Language,
-            'Plot: ' + movie.Plot,
-            'Actors: ' + movie.Actors
+                'Year released: ' + movie.Year,
+                'IMDB rating: ' + movie.imdbRating,
+                'Rotten Tomatoes: ' + movie.Ratings[1].Value,
+                'Country produced: ' + movie.Country,
+                'Language: ' + movie.Language,
+                'Plot: ' + movie.Plot,
+                'Actors: ' + movie.Actors
             ].join('\n\n');
-            fs.appendFile('log.txt', searchData, function (err) {
-                if (err) throw err;
-                console.log('\n' + searchData + '\n');
-            });
+            searchData.push(movieData);
+            toLog();
         } else {
             console.log(err);
         }
@@ -117,5 +128,12 @@ function randomFunc(input) {
         } else {
             console.log(err);
         }
+    });
+}
+
+function toLog() {
+    fs.appendFile('log.txt', searchData, function (err) {
+        if (err) throw err;
+        console.log('\n' + searchData + '\n');
     });
 }
